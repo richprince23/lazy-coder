@@ -1,0 +1,51 @@
+{
+  "name": "vscode-lazy-coder",
+  "displayName": "Lazy Coder",
+  "description": "A VS Code extension for generating code using Gemini AI",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "lazy-coder.openPanel",
+        "title": "Open Lazy Coder Panel"
+      }
+    ],
+    "configuration": {
+      "title": "Lazy Coder",
+      "properties": {
+        "lazyCoder.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API Key for the Gemini AI service"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "node ./test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.0.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.74.0",
+    "@vscode/test-electron": "^2.2.0",
+    "eslint": "^8.28.0",
+    "glob": "^8.0.3",
+    "mocha": "^10.1.0"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.18.0",
+    "axios": "^0.27.2"
+  }
+}
