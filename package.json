@@ -11,13 +11,26 @@
   ],
   "activationEvents": [],
   "main": "./extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "lazy-coder.openPanel",
-        "title": "Open Lazy Coder Panel"
+    "contributes": {
+      "viewsContainers": {
+        "activitybar": [
+          {
+            "id": "lazy-coder",
+            "title": "Lazy Coder",
+            "icon": "/icon.png"
+          }
+        ]
+      },
+      "views": {
+        "lazy-coder": [
+          {
+            "type": "webview",
+            "id": "lazyCodingSidebar",
+            "name": "Lazy Coder"
+          }
+        ]
       }
-    ],
+    },
     "configuration": {
       "title": "Lazy Coder",
       "properties": {
@@ -27,8 +40,7 @@
           "description": "API Key for the Gemini AI service"
         }
       }
-    }
-  },
+    },
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",
