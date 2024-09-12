@@ -3,12 +3,17 @@
   "displayName": "Lazy Coder",
   "description": "A VS Code extension for generating code using Gemini AI",
   "version": "0.0.1",
+  "publisher": "Suptle",
   "engines": {
     "vscode": "^1.74.0"
   },
   "categories": [
     "Other"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/richprince23/lazy-coder"
+  },
   "activationEvents": [],
   "main": "./extension.js",
     "contributes": {
