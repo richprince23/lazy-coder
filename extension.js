@@ -21,24 +21,6 @@ class LazyCodingSidebar {
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
-    // webviewView.webview.onDidReceiveMessage(async message => {
-    //     if (message.command === 'sendPrompt') {
-    //         try {
-    //             await vscode.window.withProgress({
-    //                 location: vscode.ProgressLocation.Notification,
-    //                 title: "Generating response...",
-    //                 cancellable: false
-    //             }, async (progress) => {
-    //                 const response = await this._processRequest(message.prompt, message.imagePath);
-    //                 this._insertResponseInOutput(response);
-    //                 vscode.window.showInformationMessage('Response generated!');
-    //             });
-    //         } catch (error) {
-    //             vscode.window.showErrorMessage(`Error: ${error.message}`);
-    //         }
-    //     }
-    // });
-
     webviewView.webview.onDidReceiveMessage(async (message) => {
       if (message.command === "sendPrompt") {
         try {
@@ -51,9 +33,10 @@ class LazyCodingSidebar {
             async (progress) => {
               const response = await this._processRequest(
                 message.prompt,
-                message.imagePath
+                message.imagePath,
+                message.framework
               );
-              this._insertResponseInEditor(response); // Changed from _insertResponseInOutput
+              this._insertResponseInEditor(response);
               vscode.window.showInformationMessage(
                 "Response inserted in editor!"
               );
@@ -68,66 +51,114 @@ class LazyCodingSidebar {
 
   _getHtmlForWebview(webview) {
     return `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Lazy Coder</title>
-                <style>
-                    body { font-family: var(--vscode-font-family); padding: 10px; }
-                    textarea { width: 100%; height: 100px; margin-bottom: 10px; }
-                    button { padding: 10px 20px; width:160px; min-width:100px; background-color: #0000f9; color: #fff; outline:none; border: 0; border-radius: 0.5rem;}
-                </style>
-            </head>
-            <body>
-               <h2>Lazy Coder</h2>
-                <input type="file" id="imageUpload" accept="image/*" /><br/><br/>
-                <textarea id="prompt" placeholder="Enter the name of the screen you want to generate"></textarea><br/>
-                <button onclick="send()">Generate</button>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Lazy Coder</title>
+            <style>
+                body { font-family: var(--vscode-font-family); padding: 10px; }
+                textarea { width: 100%; height: 100px; margin-bottom: 10px; }
+                #genButton { padding: 10px 20px; width:160px; min-width:100px; background-color: #0000f9; color: #fff; outline:none; border: 0; border-radius: 0.5rem; margin-top: 10px; cursor: pointer;}
+                select { width: 100%; padding: 5px; margin-bottom: 10px; }
+                #imagePreview { display: none; position: relative; margin-top: 10px; }
+                #imagePreview img { max-width: 300px; }
+                #removeImage { position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50px; width: 30px; height: 30px; cursor: pointer; }
+            </style>
+        </head>
+        <body>
+            <h2>Lazy Coder</h2>
+           <select id="framework">
+                <option value="Create a Stateless or Stateful Widget for the screen ">Flutter</option>
+                <option value="Create a functional component with hooks. Use CSS-in-JS for styling ">React</option>
+                <option value="Create a functional component with hooks. Use StyleSheet for styling ">React Native</option>
+                <option value="Create a View struct. Use SwiftUI's declarative syntax ">SwiftUI</option>
+                <option value="Create separate HTML, CSS, and JS files. Use modern CSS and flexbox features ">HTML/CSS/JavaScript</option>
+                <option value="Create an Activity or Fragment for Android. Use Android Jetpack components ">Kotlin</option>
+                <option value="Create a Vue 3 component with Composition API. Use scoped styles ">Vue</option>
+                <option value="Create an Angular component with TypeScript. Use Angular's template syntax ">Angular</option>
+            </select>
 
-                <script>
-                    const vscode = acquireVsCodeApi();
+            <textarea id="prompt" placeholder="Enter the name of the screen you want to generate"></textarea><br/>
+            <div class="controls">
+            <input type="file" id="imageUpload" accept="image/*" />
+            <button id="genButton" onclick="send()">Generate</button>
+            </div>
+            <div id="imagePreview">
+                <img id="preview" src="" alt="Preview" />
+                <button id="removeImage">X</button>
+            </div>
+            <br/>
 
-                    function send() {
-                        const prompt = document.getElementById('prompt').value;
-                        const imageUpload = document.getElementById('imageUpload').files[0];
+            <script>
+                const vscode = acquireVsCodeApi();
+                let imageData = null;
 
-                        if (imageUpload) {
-                            const reader = new FileReader();
-                            reader.onloadend = function () {
-                                vscode.postMessage({
-                                    command: 'sendPrompt',
-                                    prompt: prompt,
-                                    imagePath: reader.result
-                                });
-                            };
-                            reader.readAsDataURL(imageUpload);
-                        } else {
-                            vscode.postMessage({
-                                command: 'sendPrompt',
-                                prompt: prompt,
-                                imagePath: null
-                            });
+                document.getElementById('imageUpload').addEventListener('change', function(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            imageData = e.target.result;
+                            document.getElementById('preview').src = imageData;
+                            document.getElementById('imagePreview').style.display = 'block';
                         }
+                        reader.readAsDataURL(file);
                     }
-                </script>
-            </body>
-            </html>
-        `;
+                });
+
+                document.getElementById('removeImage').addEventListener('click', function() {
+                    imageData = null;
+                    document.getElementById('imageUpload').value = '';
+                    document.getElementById('imagePreview').style.display = 'none';
+                });
+
+                function send() {
+                    const prompt = document.getElementById('prompt').value;
+                    const framework = document.getElementById('framework').value;
+                    vscode.postMessage({
+                        command: 'sendPrompt',
+                        prompt: prompt,
+                        imagePath: imageData,
+                        framework: framework
+                    });
+                }
+            </script>
+        </body>
+        </html>
+    `;
   }
 
-  async _processRequest(prompt, imageData) {
+  async _processRequest(prompt, imageData, framework) {
     const apiKey = await this._getApiKey();
     if (!genAI) {
       genAI = new GoogleGenerativeAI(apiKey);
       fileManager = new GoogleAIFileManager(apiKey);
     }
 
+    const systemInstruction = `1. If there's an uploaded image, analyze the image and extract the following details:
+        Layout: Describe the arrangement of elements (e.g., column, row, stack).
+        Colors: Specify the colors used for background, text, borders, etc.
+        Typography: Note font family, size, weight, and style (e.g., bold, italic).
+        Spacing: Measure padding, margin, and spacing between elements.
+        Shapes: Determine the shapes of elements (e.g., rectangular, rounded, circular).
+        Borders: Specify border width, color, and style (e.g., solid, dashed).
+
+        2. Generate code for the ${framework} framework based on the extracted details or the provided prompt.
+
+        3. For the specified framework, follow these guidelines:
+        - Follow this instruction for the framework: ${framework}
+        - The output should be only the code, without any comments, markdown formatting, or explanations.
+        - Ensure the code is complete and can be directly used in a project for the specified framework.
+        - For web-based frameworks (React, Vue, Angular, HTML/CSS/JavaScript), include appropriate styling within the component or in a separate CSS file.
+        - If no image is provided, base the code on the text prompt, creating a user interface that matches the description.
+
+        4. Do not include any comments in the generated code.`;
+
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
-      systemInstruction:
-        "1.if there's an uploaded image, Analyze the image and extract the following details:\n\nLayout: Describe the arrangement of elements (e.g., column, row, stack).\nColors: Specify the colors used for background, text, borders, etc.\nTypography: Note font family, size, weight, and style (e.g., bold, italic).\nSpacing: Measure padding, margin, and spacing between elements.\nShapes: Determine the shapes of elements (e.g., rectangular, rounded, circular).\nBorders: Specify border width, color, and style (e.g., solid, dashed).\n2. Generate Flutter code based on the extracted details.\n\nassuming the response is going to be written in a dart file, only output the code with no other text data.\nAlways assume that the main.dart has already been created so skip creating the MainApp, just the screen. output should be not be markdown, just the code only",
+      systemInstruction: systemInstruction,
     });
 
     const generationConfig = {
@@ -139,7 +170,9 @@ class LazyCodingSidebar {
 
     const chatSession = model.startChat({ generationConfig });
 
-    let messageParts = [{ text: prompt }];
+    let messageParts = [
+      { text: `Create a ${framework} screen for: ${prompt}` },
+    ];
 
     if (imageData) {
       const tempFilePath = await this._saveTempFile(imageData);
@@ -176,15 +209,6 @@ class LazyCodingSidebar {
     console.log(`Uploaded file ${file.displayName} as: ${file.name}`);
     return file;
   }
-
-  // _insertResponseInOutput(response) {
-  //     if (!this._outputChannel) {
-  //         this._outputChannel = vscode.window.createOutputChannel("Lazy Coder");
-  //     }
-  //     this._outputChannel.clear();
-  //     this._outputChannel.append(response);
-  //     this._outputChannel.show();
-  // }
 
   _insertResponseInEditor(response) {
     const editor = vscode.window.activeTextEditor;
@@ -227,7 +251,6 @@ class LazyCodingSidebar {
     return apiKey;
   }
 }
-
 function activate(context) {
   const provider = new LazyCodingSidebar(context);
 
