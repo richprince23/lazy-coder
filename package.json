@@ -2,7 +2,8 @@
   "name": "vscode-lazy-coder",
   "displayName": "Lazy Coder",
   "description": "A VS Code extension for generating code using Gemini AI",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "icon": "/icon2.png",
   "publisher": "Suptle",
   "engines": {
     "vscode": "^1.74.0"

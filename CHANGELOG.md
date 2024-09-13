@@ -7,5 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [1.0.0]
 
 - Initial public release
+- Flutter support
 - Image-based generation
-- Framework selection added
+
+## [1.0.1]
+
+- Added support for React, React Native, SwiftUI, Vue, HTML/CSS/JavaScript and Angular
