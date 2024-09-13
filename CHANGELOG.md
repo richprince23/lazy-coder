@@ -4,6 +4,8 @@ All notable changes to the "lazy-coder" extension will be documented in this fil
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [1.0.0]
 
-- Initial release
+- Initial public release
+- Image-based generation
+- Framework selection added
