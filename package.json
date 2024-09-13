@@ -1,15 +1,15 @@
 {
   "name": "vscode-lazy-coder",
   "displayName": "Lazy Coder",
-  "description": "A VS Code extension for generating code using Gemini AI",
-  "version": "1.0.2",
+  "description": "Be productive in a lazy way!",
+  "version": "1.0.3",
   "icon": "icon2.png",
   "publisher": "Suptle",
   "engines": {
     "vscode": "^1.74.0"
   },
   "categories": [
-    "Other"
+    "AI", "Machine Learning", "Programming Languages", "Data Science"
   ],
   "repository": {
     "type": "git",
@@ -17,25 +17,24 @@
   },
   "activationEvents": [],
   "main": "./extension.js",
-    "contributes": {
-      "viewsContainers": {
-        "activitybar": [
-          {
-            "id": "lazy-coder",
-            "title": "Lazy Coder",
-            "icon": "/icon.png"
-          }
-        ]
-      },
-      "views": {
-        "lazy-coder": [
-          {
-            "type": "webview",
-            "id": "lazyCodingSidebar",
-            "name": "Lazy Coder"
-          }
-        ]
-      }
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "lazy-coder",
+          "title": "Lazy Coder",
+          "icon": "/icon.png"
+        }
+      ]
+    },
+    "views": {
+      "lazy-coder": [
+        {
+          "type": "webview",
+          "id": "lazyCodingSidebar",
+          "name": "Lazy Coder"
+        }
+      ]
     },
     "configuration": {
       "title": "Lazy Coder",
@@ -46,7 +45,8 @@
           "description": "API Key for the Gemini AI service"
         }
       }
-    },
+    }
+  },
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",

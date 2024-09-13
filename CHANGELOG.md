@@ -13,3 +13,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [1.0.1]
 
 - Added support for React, React Native, SwiftUI, Vue, HTML/CSS/JavaScript and Angular
+
+## [1.0.2]
+
+- Bug Fixes
+
+## [1.0.3]
+
+- Bug Fixes - Solved: issues with API key configuration

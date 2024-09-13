@@ -49,9 +49,9 @@ This extension contributes the following settings:
 
 ## Release Notes
 
-### 1.0.1
+### 1.0.3
 
-- Added support for React, React Native, SwiftUI, Vue, HTML/CSS/JavaScript and Angular
+- Bug Fixes - Issues with API key configuration solved
 
 ---
 
